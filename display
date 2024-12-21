@@ -1,0 +1,105 @@
+<!-- Full HTML, CSS, and JavaScript Inline -->
+<div style="text-align: center;">
+    <h2 style="margin-bottom: 20px;">Our Impact</h2>
+
+    <!-- Counter Section -->
+    <div style="display: flex; justify-content: center; align-items: center; gap: 50px; margin-bottom: 30px;">
+        <div>
+            <h3>CO₂ Emissions Saved</h3>
+            <div id="co2-counter" style="font-size: 48px; font-weight: bold;">0 metric tons</div>
+        </div>
+        <div>
+            <h3>Pounds of Tennis String Collected</h3>
+            <div id="counter" style="font-size: 48px; font-weight: bold;">0 lbs</div>
+        </div>
+        <div>
+            <h3>Collection Locations</h3>
+            <div id="locations-counter" style="font-size: 48px; font-weight: bold;">0</div>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+        <h3 style="color: #4CAF50; font-weight: bold;">Current String Collection Locations</h3>
+        <p style="font-size: 16px; color: #555;">
+            Explore the map below to see where we are actively collecting tennis strings for recycling.
+        </p>
+    </div>
+
+    <div id="map" style="height: 500px; width: 100%; background-color: #f0f0f0;">Loading map...</div>
+</div>
+
+<!-- Include Leaflet.js Library -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        console.log("DOM is fully loaded!");
+
+        // Conversion Factor: CO2 emissions saved per pound of string
+        const CO2_SAVED_PER_POUND = 0.05; // Example: 0.05 metric tons of CO2 per pound of string
+
+        // Animate Counter Function
+        function animateCounter(id, start, end, duration, unit = "") {
+            const counter = document.getElementById(id);
+            const range = end - start;
+            const increment = range / (duration / 20); // Update every 20ms
+            let current = start;
+
+            const timer = setInterval(() => {
+                current += increment;
+                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                counter.innerText = current.toFixed(2).toLocaleString() + unit; // Format with commas and optional unit
+            }, 20);
+        }
+
+        // Start the animated counters
+        const poundsCollected = 3010.05; // Total pounds collected
+        animateCounter('counter', 0, poundsCollected, 3000, " lbs"); // Count from 0 to 3010.05 lbs in 3 seconds
+
+        const co2Saved = poundsCollected * CO2_SAVED_PER_POUND; // Calculate CO2 emissions saved
+        animateCounter('co2-counter', 0, co2Saved, 3000, " metric tons"); // Count from 0 to calculated CO2 saved
+
+        const totalLocations = 15; // Number of collection locations
+        animateCounter('locations-counter', 0, totalLocations, 3000); // Count from 0 to 15 in 3 seconds
+
+        // Initialize Leaflet Map
+        const map = L.map("map").setView([39.8283, -98.5795], 5); // Centered on the US
+
+        // Add OpenStreetMap tiles
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        }).addTo(map);
+
+        // Locations with latitude and longitude
+        const locations = [
+            { name: "Lakewood Country Club", lat: 39.0795, lng: -77.1876 },
+            { name: "Tennisplex", lat: 39.1031, lng: -77.2196 },
+            { name: "JTCC", lat: 39.0000, lng: -76.8800 },
+            { name: "Tennis Topia", lat: 39.0945, lng: -77.1506 },
+            { name: "Citi Open", lat: 38.9213, lng: -77.0524 },
+            { name: "Holabird Sports", lat: 39.3365, lng: -76.5240 },
+            { name: "Woodmont Country Club", lat: 39.0393, lng: -77.0947 },
+            { name: "Congressional Country Club", lat: 39.0026, lng: -77.1621 },
+            { name: "Precision Stringing", lat: 38.8951, lng: -77.0364 },
+            { name: "String That Thing LLC", lat: 38.8048, lng: -77.0469 },
+            { name: "Annapolis Tennis Lab", lat: 38.9784, lng: -76.4922 },
+            { name: "Tennis Zone Plus", lat: 40.1578, lng: -75.3330 },
+            { name: "Capital Stringing and Tennis", lat: 38.8951, lng: -77.0364 },
+            { name: "Mains and Crosses LLC", lat: 38.9687, lng: -77.3411 },
+            { name: "Tennis String Theory", lat: 38.8951, lng: -77.0364 },
+        ];
+
+        // Add markers to the map
+        locations.forEach((location) => {
+            L.marker([location.lat, location.lng])
+                .addTo(map)
+                .bindPopup(`<h4>${location.name}</h4>`); // Use backticks for proper string interpolation
+        });
+
+        console.log("Map and counters initialized successfully.");
+    });
+</script>
